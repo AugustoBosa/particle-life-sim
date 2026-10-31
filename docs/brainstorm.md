@@ -85,7 +85,7 @@ particle_life_sim/
 
 ## Critérios de pronto
 
-- 2D: 10k partículas a ≥ 50 FPS num notebook comum; mudar a matriz muda o padrão em segundos.
+- 2D: 5k partículas a ≥ 50 FPS num notebook comum (10k fica para a fase GPU); mudar a matriz muda o padrão em segundos.
 - 3D: 5k partículas a ≥ 50 FPS; orbitar a câmera sem travar.
 - `npm test` passa; push na `main` publica no Pages sem passo manual.
 
