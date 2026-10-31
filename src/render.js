@@ -7,12 +7,18 @@ export function createRenderer(canvas) {
   renderer.setPixelRatio(window.devicePixelRatio);
   const scene = new THREE.Scene();
   const camera = new THREE.OrthographicCamera();
-  const points = new THREE.Points(
-    new THREE.BufferGeometry(),
-    new THREE.PointsMaterial({ size: 3, vertexColors: true, sizeAttenuation: false }),
-  );
-  points.frustumCulled = false; // as posições mudam todo frame; bounding sphere ficaria velha
-  scene.add(points);
+  const material = new THREE.PointsMaterial({ size: 3, vertexColors: true, sizeAttenuation: false });
+  // o mundo é um toro: 3×3 cópias do mesmo geometry preenchem telas não quadradas sem distorcer
+  const tiles = [];
+  for (let x = -1; x <= 1; x++) {
+    for (let y = -1; y <= 1; y++) {
+      const t = new THREE.Points(new THREE.BufferGeometry(), material);
+      t.position.set(x, y, 0);
+      t.frustumCulled = false; // as posições mudam todo frame; bounding sphere ficaria velha
+      scene.add(t);
+      tiles.push(t);
+    }
+  }
 
   // mostra o quadrado [0,1]² inteiro, centralizado, sem distorcer
   function resize() {
@@ -28,10 +34,11 @@ export function createRenderer(canvas) {
   const col = new THREE.Color();
   return {
     draw(state) {
-      let geo = points.geometry;
+      let geo = tiles[0].geometry;
       if (geo.attributes.position?.count !== state.count) {
         geo.dispose();
-        geo = points.geometry = new THREE.BufferGeometry();
+        geo = new THREE.BufferGeometry();
+        for (const t of tiles) t.geometry = geo;
         geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(state.count * 3), 3));
         geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(state.count * 3), 3));
       }

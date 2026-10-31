@@ -11,5 +11,6 @@ export function createUI(params, actions) {
   gui.add(actions, 'stepOnce').name('passo');
   gui.add(actions, 'reset').name('resetar');
   gui.add(actions, 'randomize').name('randomizar matriz');
+  if (window.innerWidth < 600) gui.close(); // no celular o painel aberto cobre metade da tela
   return gui;
 }
