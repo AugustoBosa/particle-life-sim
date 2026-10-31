@@ -7,10 +7,13 @@
   <style>
     html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
     #sim { display: block; }
+    #matrix { position: fixed; left: 12px; top: 12px; width: 200px; height: 200px; background: #111; cursor: pointer; }
   </style>
 </head>
 <body data-dims="2">
   <canvas id="sim"></canvas>
+  <canvas id="matrix" width="400" height="400" aria-label="Matriz de atração"
+    title="Clique: +0.2 · Botão direito: −0.2"></canvas>
   <script type="module" src="./src/main.js"></script>
 </body>
 </html>

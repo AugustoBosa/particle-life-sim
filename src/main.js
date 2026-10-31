@@ -1,6 +1,7 @@
 import { createState, randomMatrix, step } from './physics.js';
 import { createRenderer } from './render.js';
 import { createUI } from './ui.js';
+import { createMatrixEditor } from './matrix-editor.js';
 
 const dims = Number(document.body.dataset.dims);
 const params = {
@@ -9,14 +10,17 @@ const params = {
 params.matrix = randomMatrix(params.colors);
 let state = createState(params.count, params.colors, dims);
 const renderer = createRenderer(document.getElementById('sim'));
+const editor = createMatrixEditor(document.getElementById('matrix'), params);
 
 const actions = {
   reset() {
     if (params.matrix.length !== params.colors ** 2) params.matrix = randomMatrix(params.colors);
     state = createState(params.count, params.colors, dims);
+    editor.draw();
   },
   randomize() {
     params.matrix = randomMatrix(params.colors);
+    editor.draw();
   },
   stepOnce() {
     params.paused = true;
