@@ -37,8 +37,7 @@ depois wrap (espaço toroidal: sai de um lado, entra no oposto).
 Vizinhança: grid espacial com célula = `rMax`, reconstruído a cada passo. Sem grid seria
 O(n²); com grid fica ~O(n·k).
 
-Fase GPU: mesma assinatura `step(state, params)`, implementação WebGPU compute shader.
-Render e UI não mudam.
+Fase GPU: compute shader WebGPU. As posições devem ficar na GPU e o render precisa ler o mesmo buffer (ex.: `WebGPURenderer` do Three.js com storage buffer), então `render.js` muda e `step` pode virar assíncrono. A UI e o formato de `params` não mudam.
 
 ## Escopo
 

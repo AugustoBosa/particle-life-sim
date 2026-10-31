@@ -46,3 +46,24 @@ test('step: 3D mantém posições em [0,1) e finitas', () => {
   for (let k = 0; k < 20; k++) step(s, p);
   assert.ok(s.pos.every((x) => Number.isFinite(x) && x >= 0 && x <= 1));
 });
+
+for (const dims of [2, 3]) {
+  test(`step: grid bate com força bruta O(n²) (${dims}D)`, () => {
+    const matrix = new Float32Array([1, -0.5, 0.2, 0.8, -1, 0.3, -0.2, 0.6, 0.4]);
+    const p = { matrix, colors: 3, rMax: 0.1, frictionHalfLife: 0.04, forceFactor: 10, dt: 0.02 };
+    const s = createState(300, 3, dims);
+    const pos = Float32Array.from(s.pos);
+    const ref = new Float64Array(300 * dims);
+    for (let i = 0; i < 300; i++) {
+      for (let j = 0; j < 300; j++) {
+        const d = Array.from({ length: dims }, (_, k) => { const v = pos[j * dims + k] - pos[i * dims + k]; return v - Math.round(v); });
+        const r = Math.hypot(...d);
+        if (r === 0 || r >= p.rMax) continue;
+        const F = force(r / p.rMax, matrix[s.color[i] * 3 + s.color[j]]);
+        for (let k = 0; k < dims; k++) ref[i * dims + k] += (d[k] / r) * F * p.rMax * p.forceFactor * p.dt;
+      }
+    }
+    step(s, p);
+    for (let k = 0; k < ref.length; k++) assert.ok(Math.abs(s.vel[k] - ref[k]) < 1e-5, `vel[${k}] ${s.vel[k]} != ${ref[k]}`);
+  });
+}

@@ -19,7 +19,7 @@ export function createState(count, colors, dims) {
   };
 }
 
-// ponytail: CPU single-thread, ~O(n·vizinhos). Teto medido na Task 1; acima dele,
+// ponytail: CPU single-thread, ~O(n·vizinhos). Teto medido em docs/brainstorm.md › Riscos; acima dele,
 // o caminho é WebGPU compute (fase GPU do spec), não Web Worker.
 export function step(state, params) {
   const { count, dims, pos, vel, color } = state;
