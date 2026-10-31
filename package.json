@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test"
+    "test": "node --test",
+    "deploy": "gh workflow run Deploy --ref main"
   },
   "dependencies": {
     "lil-gui": "^0.21.0",

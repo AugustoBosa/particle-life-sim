@@ -15,3 +15,9 @@ npm test
 ## Publicar
 
 Push na `main` roda `.github/workflows/deploy.yml`. Uma vez só, no GitHub: Settings → Pages → Source = **GitHub Actions**.
+
+Se o push não disparar o deploy (acontece neste repo, causa ainda desconhecida), publique na mão depois do push:
+
+```bash
+npm run deploy
+```
