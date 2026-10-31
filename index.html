@@ -3,18 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Particle Life 2D</title>
+  <title>Particle Life</title>
   <style>
     html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
     #sim { display: block; }
     #matrix { position: fixed; left: 12px; top: 12px; width: 200px; height: 200px; background: #111; cursor: pointer; }
+    #mode { position: fixed; right: 12px; bottom: 12px; padding: 8px 12px; border-radius: 6px; background: #111c; color: #ddd; font: 14px system-ui, sans-serif; text-decoration: none; }
     @media (max-width: 600px) { #matrix { top: auto; bottom: 12px; width: 140px; height: 140px; } }
   </style>
 </head>
-<body data-dims="2">
+<body>
   <canvas id="sim"></canvas>
   <canvas id="matrix" width="400" height="400" aria-label="Matriz de atração"
     title="Clique: +0.2 · Botão direito: −0.2"></canvas>
+  <a id="mode" href="?3d">3D →</a>
   <script type="module" src="./src/main.js"></script>
 </body>
 </html>

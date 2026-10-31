@@ -53,7 +53,7 @@ Fase GPU: compute shader WebGPU. As posições devem ficar na GPU e o render pre
 2. Three.js `Points` com sprite suave
 3. `OrbitControls` (arrastar gira, scroll zoom)
 4. Cubo com wrap nas 6 faces + contorno wireframe
-5. Página `3d.html`, link entre 2D e 3D
+5. Mesma página com `?3d` na URL, link entre 2D e 3D
 
 ### Depois (fora da v1)
 - Presets com nome + link compartilhável (matriz na URL)
@@ -68,8 +68,7 @@ Fase GPU: compute shader WebGPU. As posições devem ficar na GPU e o render pre
 
 ```
 particle_life_sim/
-├── index.html              # 2D  (<body data-dims="2">)
-├── 3d.html                 # 3D  (<body data-dims="3">)
+├── index.html              # 2D; ?3d = 3D
 ├── src/
 │   ├── main.js             # lê data-dims, liga sim + render + ui, loop rAF
 │   ├── physics.js          # force(), step(), grid espacial
