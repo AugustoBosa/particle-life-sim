@@ -94,3 +94,6 @@ particle_life_sim/
 
 - `base` errado no Vite → página em branco no Pages (assets 404). Testar com `npm run preview`.
 - CPU 3D com raio grande explode o nº de vizinhos → limitar `rMax` no slider.
+- FPS na CPU (medido 2026-10-31, física isolada no Node, após agrupar): versão ingênua 10k 2D = 88 ms/passo;
+  com kernel único + posições ordenadas por célula = 18.6 ms (10k 2D, no limite de 50 FPS), 5.2 ms (5k 2D),
+  9.6 ms (5k 3D). Acima disso, só a fase GPU resolve.
