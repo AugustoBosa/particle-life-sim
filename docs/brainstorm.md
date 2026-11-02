@@ -1,29 +1,35 @@
-# Particle Life Sim — Brainstorm / Spec
+# Particle Life Sim — Spec e registro do projeto
 
-Data: 2026-10-31 · Status: aprovado no brainstorm, aguardando plano de implementação.
+Criado: 2026-10-31 · Atualizado: 2026-11-02 · Status: **2D v1, 3D v1 e extras no ar.** Próxima fase grande: GPU.
+
+Site: https://augustobosa.github.io/particle-life-sim/ (3D: `?3d`)
+Repo: https://github.com/AugustoBosa/particle-life-sim
 
 ## Objetivo
 
 Página web com um simulador de *particle life*: partículas de N cores se atraem ou se
-repelem segundo uma matriz N×N, gerando padrões emergentes (células, cobras, órbitas).
-Primeiro 2D, depois 3D. Hospedado no GitHub Pages.
+repelem segundo uma matriz N×N, gerando padrões emergentes (aglomerados, cobras, órbitas).
+2D e 3D na mesma página. Hospedado no GitHub Pages.
 
 ## Decisões técnicas
 
 | Tema | Decisão | Por quê |
 |---|---|---|
-| Build/deploy | Vite + GitHub Actions publicando `dist/` no Pages | npm, hot reload; `base` do Vite = nome do repo |
-| Física | CPU primeiro (5k–20k partículas), WebGPU numa fase posterior | depurar fácil agora; GPU troca só a física |
-| Render | Three.js `Points` nos dois modos (2D = câmera ortográfica, z=0) | um renderer só para 2D e 3D, aguenta 20k pontos fácil |
-| Controles | lil-gui + editor de matriz próprio em `<canvas>` | lil-gui cobre sliders/botões; matriz precisa ser clicável |
-| Testes | `node --test` (runner nativo) na função de força e no `step()` | zero dependência de teste |
+| Build/deploy | Vite + GitHub Actions publicando `dist/` no Pages; `base: './'` | caminhos relativos funcionam com qualquer nome de repo |
+| Física | CPU, single-thread, grid espacial (WebGPU é a próxima fase) | fácil de depurar; 5k partículas a ≥ 50 FPS |
+| Render | Three.js `Points`. 2D: câmera ortográfica + 3×3 cópias do toro (tela cheia sem distorcer). 3D: perspectiva + `OrbitControls` + cubo wireframe | um renderer só para os dois modos |
+| Modo 3D | mesma página com `?3d` na URL (em vez de `3d.html`) | sem CSS duplicado nem config multi-page |
+| Controles | lil-gui + editor de matriz próprio em `<canvas>` | lil-gui cobre sliders; a matriz precisa ser clicável |
+| Velocidade | 60 passos/s em tempo real, no máx. 2 por frame | igual em telas de 60, 120 ou 144 Hz |
+| Compartilhar | configuração no `#` da URL (`c`, `r`, `f`, `k`, `m` = matriz ×100 separada por `_`), validada e limitada à faixa dos sliders | link vem de qualquer pessoa |
+| Testes | `node --test` (runner nativo) | zero dependência de teste |
 
 ## Física
 
-Estado em typed arrays (`Float32Array`): posições, velocidades, `Uint8Array` de cores.
-Uma única função `step(state, params)` serve 2D e 3D via `params.dims` (2 ou 3).
+Estado em typed arrays: posições e velocidades (`Float32Array`), cores (`Uint8Array`).
+Uma única função `step(state, params)` serve 2D e 3D (`state.dims` = 2 ou 3).
 
-Força entre duas partículas, com `r` = distância / `rMax` e `a` = `matrix[corA][corB]` (−1..1):
+Força entre duas partículas, com `r` = distância / `rMax` e `a` = `matrix[corA * n + corB]` (−1..1):
 
 ```
 r < β        →  r/β − 1                          (repulsão universal de perto)
@@ -31,67 +37,97 @@ r < β        →  r/β − 1                          (repulsão universal de p
 r ≥ 1        →  0
 ```
 
-`β` ≈ 0.3. Por passo: `v *= atrito`, `v += F · rMax · força · dt`, `p += v · dt`,
-depois wrap (espaço toroidal: sai de um lado, entra no oposto).
+`β` = 0.3. Por passo: `v = v · atrito + F · rMax · força · dt`, `p += v · dt`, depois wrap
+(espaço toroidal [0,1)^dims: sai de um lado, entra no oposto).
 
-Vizinhança: grid espacial com célula = `rMax`, reconstruído a cada passo. Sem grid seria
-O(n²); com grid fica ~O(n·k).
+Vizinhança: grid com célula ≥ `rMax` (mín. 3 células por eixo), posições copiadas em ordem
+de célula para os vizinhos ficarem contíguos na memória. 2D usa o mesmo kernel com uma camada em z.
 
-Fase GPU: compute shader WebGPU. As posições devem ficar na GPU e o render precisa ler o mesmo buffer (ex.: `WebGPURenderer` do Three.js com storage buffer), então `render.js` muda e `step` pode virar assíncrono. A UI e o formato de `params` não mudam.
+Fase GPU: compute shader WebGPU. As posições devem ficar na GPU e o render precisa ler o mesmo
+buffer (ex.: `WebGPURenderer` do Three.js com storage buffer), então `render.js` muda e `step`
+pode virar assíncrono. A UI e o formato de `params` não mudam. O teste de força bruta em
+`physics.test.js` serve de oráculo para a versão GPU.
 
 ## Escopo
 
-### 2D v1
-1. N cores (2–8), matriz N×N aleatória
-2. Matriz clicável (clique +/−) e botão randomizar
-3. Sliders: nº de partículas, raio `rMax`, atrito, força
-4. Bordas com wrap
-5. Pausar / passo único / resetar
+### Feito
 
-### 3D v1
-1. Mesma física com `dims = 3`, mesma matriz e sliders
-2. Three.js `Points` com sprite suave
-3. `OrbitControls` (arrastar gira, scroll zoom)
-4. Cubo com wrap nas 6 faces + contorno wireframe
-5. Mesma página com `?3d` na URL, link entre 2D e 3D
+- **2D v1:** N cores (2–8), matriz aleatória clicável, sliders (partículas, cores, raio, atrito,
+  força), wrap nas bordas, pausar / passo / resetar.
+- **3D v1:** mesma física com `dims = 3`, pontos redondos suaves, câmera orbital, cubo wireframe,
+  link entre 2D e 3D.
+- **Celular:** painel começa fechado, matriz menor no canto inferior, tela cheia via cópias do toro,
+  opção "toque diminui" (toque não tem botão direito).
+- **Presets** (select): aglomerados, cobras, órbitas.
+- **Link compartilhável:** botão "copiar link".
+- **Visual:** rastro (0–0.9) e brilho (mistura aditiva).
 
-### Depois (fora da v1)
-- Presets com nome + link compartilhável (matriz na URL)
-- Mouse atraindo/repelindo
-- Trails/glow, neblina de profundidade, auto-rotação
-- FPS + screenshot
-- Mobile/touch
+### Depois
+
 - Física em WebGPU (100k+ partículas)
+- Mouse/toque atraindo ou repelindo partículas
+- Neblina de profundidade e auto-rotação no 3D
+- Contador de FPS e screenshot
 - VR/WebXR
 
 ## Estrutura
 
 ```
 particle_life_sim/
-├── index.html              # 2D; ?3d = 3D
+├── index.html              # página única; ?3d = modo 3D
 ├── src/
-│   ├── main.js             # lê data-dims, liga sim + render + ui, loop rAF
+│   ├── main.js             # params, modo 2D/3D, loop de passo fixo, ações
 │   ├── physics.js          # force(), step(), grid espacial
-│   ├── physics.test.js     # node --test
-│   ├── render.js           # Three.js Points, câmera orto (2D) ou perspectiva+orbit (3D)
+│   ├── physics.test.js     # curva de força, atração/repulsão, wrap, força bruta 2D/3D
+│   ├── render.js           # Three.js: 2D (orto + tiles) ou 3D (perspectiva + orbit); rastro e brilho
 │   ├── matrix-editor.js    # canvas N×N clicável
-│   └── ui.js               # painel lil-gui
+│   ├── ui.js               # painel lil-gui
+│   ├── presets.js          # matrizes dos presets
+│   ├── share.js            # encode/decode do link
+│   └── share.test.js
 ├── .github/workflows/deploy.yml
-├── vite.config.js          # base + multi-page (index.html, 3d.html)
-├── package.json
-└── docs/brainstorm.md
+├── vite.config.js          # base './'
+├── package.json            # dev, build, test, deploy
+└── docs/
+    ├── brainstorm.md       # este arquivo
+    └── superpowers/plans/  # planos de implementação do 2D e do 3D
 ```
 
 ## Critérios de pronto
 
-- 2D: 5k partículas a ≥ 50 FPS num notebook comum (10k fica para a fase GPU); mudar a matriz muda o padrão em segundos.
-- 3D: 5k partículas a ≥ 50 FPS; orbitar a câmera sem travar.
-- `npm test` passa; push na `main` publica no Pages sem passo manual.
+| Critério | Resultado |
+|---|---|
+| 2D: 5k partículas a ≥ 50 FPS | ✅ física ≈ 11 ms/passo no navegador |
+| 3D: 5k partículas a ≥ 50 FPS | ✅ física ≈ 9.7 ms/passo |
+| `npm test` passa | ✅ 9/9 |
+| push na `main` publica sozinho | ⚠️ não — ver "Problemas conhecidos" |
+
+O critério original de 10k partículas a ≥ 50 FPS no 2D foi rebaixado para 5k em 2026-10-31:
+no navegador, 10k gastam 44–82 ms/passo (varia com a matriz). 10k fica para a fase GPU.
+
+## Problemas conhecidos
+
+- **Push não dispara o deploy.** O GitHub registra o push, o workflow está ativo e o YAML é válido,
+  mas nenhum run com `event=push` é criado (testado 3×, inclusive com a credencial do `gh`).
+  O disparo manual funciona. Contorno: `npm run deploy` depois do push. O repo `trebuchet`, com
+  workflow quase igual, disparava por push até 2026-10-27. Se ele também parar, o problema é da conta.
+- **Rastro longo deixa fantasma:** por isso o slider vai só até 0.9.
+- **Copiar link** depende da API de clipboard; se o navegador bloquear, o botão avisa que o link está
+  na barra de endereço.
 
 ## Riscos
 
-- `base` errado no Vite → página em branco no Pages (assets 404). Testar com `npm run preview`.
-- CPU 3D com raio grande explode o nº de vizinhos → limitar `rMax` no slider.
-- FPS na CPU (medido 2026-10-31, física isolada no Node, após agrupar): versão ingênua 10k 2D = 88 ms/passo;
-  com kernel único + posições ordenadas por célula = 18.6 ms (10k 2D, no limite de 50 FPS), 5.2 ms (5k 2D),
-  9.6 ms (5k 3D). Acima disso, só a fase GPU resolve.
+- `base` errado no Vite → página em branco no Pages (assets 404).
+- CPU 3D com raio grande explode o nº de vizinhos → `rMax` limitado a 0.3 no slider.
+- FPS na CPU (medido 2026-10-31, após as partículas agruparem): versão ingênua 10k 2D = 88 ms/passo;
+  com kernel único + posições ordenadas por célula: 18.6 ms no Node e 44–82 ms no navegador (10k 2D),
+  5.2 ms (5k 2D), 9.6 ms (5k 3D).
+
+## Histórico
+
+| Data | O que mudou |
+|---|---|
+| 2026-10-31 | Brainstorm, spec, plano 2D, implementação 2D v1 (5 tasks com subagentes + revisão), deploy no Pages |
+| 2026-10-31 | Layout no celular; investigação do gatilho de push; script `npm run deploy` |
+| 2026-10-31 | Plano e implementação do 3D v1 |
+| 2026-11-02 | Velocidade fixa, "toque diminui", presets, link compartilhável, rastro e brilho; presets em select |
