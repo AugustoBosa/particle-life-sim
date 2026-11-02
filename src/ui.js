@@ -1,4 +1,5 @@
 import GUI from 'lil-gui';
+import { PRESETS } from './presets.js';
 
 export function createUI(params, actions) {
   const gui = new GUI({ title: 'Particle Life' });
@@ -12,6 +13,11 @@ export function createUI(params, actions) {
   gui.add(actions, 'stepOnce').name('passo');
   gui.add(actions, 'reset').name('resetar');
   gui.add(actions, 'randomize').name('randomizar matriz');
+  for (const name of Object.keys(PRESETS)) gui.add({ [name]: () => actions.preset(name) }, name).name('preset: ' + name);
+  const share = gui.add({ share: async () => {
+    share.name((await actions.share()) ? 'link copiado ✓' : 'link na barra de endereço');
+    setTimeout(() => share.name('copiar link'), 2000);
+  } }, 'share').name('copiar link');
   if (window.innerWidth < 600) gui.close(); // no celular o painel aberto cobre metade da tela
   return gui;
 }
