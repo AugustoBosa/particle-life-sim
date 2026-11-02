@@ -144,10 +144,6 @@ A verificação foi feita no painel do navegador do app, que ficava oculto e pau
 4. Cores das partículas reenviadas à GPU a cada frame; só precisam mudar no reset (usar flag "dirty", não só o tamanho do buffer).
 5. Tooltip da matriz usa "+0.2" em vez de "+0,2"; editor sem teclado; canvas da matriz sem ajuste de devicePixelRatio.
 
-### Limpeza
-- Branches `feat/2d-v1`, `feat/3d-v1` e `feat/extras` no GitHub já estão na `main` e podem ser apagadas.
-- Commit vazio `c834b94` (teste de diagnóstico do deploy) ficou no histórico; inofensivo.
-
 ## Riscos
 
 - `base` errado no Vite → página em branco no Pages (assets 404).
@@ -165,3 +161,4 @@ A verificação foi feita no painel do navegador do app, que ficava oculto e pau
 | 2026-10-31 | Plano e implementação do 3D v1 |
 | 2026-11-02 | Velocidade fixa, "toque diminui", presets, link compartilhável, rastro e brilho; presets em select |
 | 2026-11-02 | Documentação final e lista "Em aberto"; projeto em stand-by |
+| 2026-11-02 | Limpeza: branches de feature já mergeadas apagadas (só resta `main`) |
