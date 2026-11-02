@@ -16,7 +16,8 @@ export function createUI(params, actions) {
   gui.add(actions, 'stepOnce').name('passo');
   gui.add(actions, 'reset').name('resetar');
   gui.add(actions, 'randomize').name('randomizar matriz');
-  for (const name of Object.keys(PRESETS)) gui.add({ [name]: () => actions.preset(name) }, name).name('preset: ' + name);
+  gui.add({ preset: '—' }, 'preset', ['—', ...Object.keys(PRESETS)]).name('preset')
+    .onChange((name) => name !== '—' && actions.preset(name));
   const share = gui.add({ share: async () => {
     share.name((await actions.share()) ? 'link copiado ✓' : 'link na barra de endereço');
     setTimeout(() => share.name('copiar link'), 2000);
