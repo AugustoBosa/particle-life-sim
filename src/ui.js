@@ -8,6 +8,9 @@ export function createUI(params, actions) {
   gui.add(params, 'rMax', 0.02, 0.3, 0.01).name('raio');
   gui.add(params, 'frictionHalfLife', 0.005, 0.2, 0.005).name('atrito (meia-vida)');
   gui.add(params, 'forceFactor', 1, 30, 0.5).name('força');
+  // ponytail: rastro até 0.9; acima disso o arredondamento de 8 bits deixa um fantasma fraco que nunca some
+  gui.add(params, 'trail', 0, 0.9, 0.05).name('rastro');
+  gui.add(params, 'glow').name('brilho');
   gui.add(params, 'subtract').name('toque diminui');
   gui.add(params, 'paused').name('pausar').listen();
   gui.add(actions, 'stepOnce').name('passo');

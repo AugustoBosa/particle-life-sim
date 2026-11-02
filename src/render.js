@@ -19,7 +19,12 @@ function dotTexture() {
 
 export function createRenderer(canvas, dims) {
   const is3d = dims === 3;
-  const renderer = new THREE.WebGLRenderer({ canvas });
+  // rastro: em vez de limpar, cada frame pinta um preto semitransparente por cima do anterior
+  const renderer = new THREE.WebGLRenderer({ canvas, preserveDrawingBuffer: true });
+  renderer.autoClear = false;
+  const fadeMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, depthTest: false, depthWrite: false });
+  const fadeScene = new THREE.Scene().add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), fadeMaterial));
+  const fadeCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);
   renderer.setPixelRatio(window.devicePixelRatio);
   const scene = new THREE.Scene();
   const camera = is3d ? new THREE.PerspectiveCamera(50, 1, 0.01, 20) : new THREE.OrthographicCamera();
@@ -71,7 +76,7 @@ export function createRenderer(canvas, dims) {
 
   const col = new THREE.Color();
   return {
-    draw(state) {
+    draw(state, { trail = 0, glow = false } = {}) {
       let geo = tiles[0].geometry;
       if (geo.attributes.position?.count !== state.count) {
         geo.dispose();
@@ -88,6 +93,10 @@ export function createRenderer(canvas, dims) {
       geo.attributes.position.needsUpdate = true;
       geo.attributes.color.needsUpdate = true;
       controls?.update();
+      material.blending = glow ? THREE.AdditiveBlending : THREE.NormalBlending;
+      fadeMaterial.opacity = 1 - trail; // trail 0 = limpa tudo
+      renderer.render(fadeScene, fadeCamera);
+      renderer.clearDepth();
       renderer.render(scene, camera);
     },
   };

@@ -7,7 +7,7 @@ import { encode, decode } from './share.js';
 
 const dims = new URLSearchParams(window.location.search).has('3d') ? 3 : 2;
 const params = {
-  count: 5000, colors: 6, rMax: dims === 3 ? 0.1 : 0.05, frictionHalfLife: 0.04, forceFactor: 10, dt: 0.02, paused: false, subtract: false,
+  count: 5000, colors: 6, rMax: dims === 3 ? 0.1 : 0.05, frictionHalfLife: 0.04, forceFactor: 10, dt: 0.02, paused: false, subtract: false, trail: 0, glow: false,
 };
 // link compartilhado (#c=…&m=…) tem prioridade sobre a matriz aleatória
 Object.assign(params, decode(window.location.hash) ?? { matrix: randomMatrix(params.colors) });
@@ -56,7 +56,7 @@ function frame(now) {
   acc = Math.min(acc + now - last, 2 * STEP_MS);
   last = now;
   if (!params.paused) for (; acc >= STEP_MS; acc -= STEP_MS) step(state, params);
-  renderer.draw(state);
+  renderer.draw(state, params);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
