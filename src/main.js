@@ -5,7 +5,7 @@ import { createMatrixEditor } from './matrix-editor.js';
 
 const dims = new URLSearchParams(window.location.search).has('3d') ? 3 : 2;
 const params = {
-  count: 5000, colors: 6, rMax: dims === 3 ? 0.1 : 0.05, frictionHalfLife: 0.04, forceFactor: 10, dt: 0.02, paused: false,
+  count: 5000, colors: 6, rMax: dims === 3 ? 0.1 : 0.05, frictionHalfLife: 0.04, forceFactor: 10, dt: 0.02, paused: false, subtract: false,
 };
 params.matrix = randomMatrix(params.colors);
 let state = createState(params.count, params.colors, dims);
@@ -32,9 +32,14 @@ const actions = {
 };
 createUI(params, actions);
 
-function frame() {
-  if (!params.paused) step(state, params);
+// ponytail: 60 passos/s em tempo real, no máximo 2 por frame; se a CPU não der conta, a sim fica lenta em vez de travar
+const STEP_MS = 1000 / 60;
+let last = performance.now(), acc = 0;
+function frame(now) {
+  acc = Math.min(acc + now - last, 2 * STEP_MS);
+  last = now;
+  if (!params.paused) for (; acc >= STEP_MS; acc -= STEP_MS) step(state, params);
   renderer.draw(state);
   requestAnimationFrame(frame);
 }
-frame();
+requestAnimationFrame(frame);

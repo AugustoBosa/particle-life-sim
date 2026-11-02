@@ -33,7 +33,7 @@ export function createMatrixEditor(canvas, params) {
     draw();
   }
 
-  canvas.addEventListener('click', (e) => edit(e, 0.2));
+  canvas.addEventListener('click', (e) => edit(e, params.subtract ? -0.2 : 0.2));
   canvas.addEventListener('contextmenu', (e) => edit(e, -0.2));
   draw();
   return { draw };

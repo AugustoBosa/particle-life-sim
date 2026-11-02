@@ -7,6 +7,7 @@ export function createUI(params, actions) {
   gui.add(params, 'rMax', 0.02, 0.3, 0.01).name('raio');
   gui.add(params, 'frictionHalfLife', 0.005, 0.2, 0.005).name('atrito (meia-vida)');
   gui.add(params, 'forceFactor', 1, 30, 0.5).name('força');
+  gui.add(params, 'subtract').name('toque diminui');
   gui.add(params, 'paused').name('pausar').listen();
   gui.add(actions, 'stepOnce').name('passo');
   gui.add(actions, 'reset').name('resetar');
