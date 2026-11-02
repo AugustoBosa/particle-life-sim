@@ -1,6 +1,6 @@
 # Particle Life Sim — Spec e registro do projeto
 
-Criado: 2026-10-31 · Atualizado: 2026-11-02 · Status: **2D v1, 3D v1 e extras no ar.** Próxima fase grande: GPU.
+Criado: 2026-10-31 · Atualizado: 2026-11-02 · Status: **em stand-by desde 2026-11-02.** 2D v1, 3D v1 e extras no ar. Antes de retomar, leia "Em aberto".
 
 Site: https://augustobosa.github.io/particle-life-sim/ (3D: `?3d`)
 Repo: https://github.com/AugustoBosa/particle-life-sim
@@ -115,6 +115,39 @@ no navegador, 10k gastam 44–82 ms/passo (varia com a matriz). 10k fica para a 
 - **Copiar link** depende da API de clipboard; se o navegador bloquear, o botão avisa que o link está
   na barra de endereço.
 
+## Em aberto (para retomar)
+
+### Problemas sem resolver
+1. **Deploy automático não funciona** (ver "Problemas conhecidos"). Teste pendente: dar push no repo
+   `trebuchet` e ver se a aba Actions roda sozinha. Se não rodar, o problema é da conta (abrir chamado
+   no suporte do GitHub). Se rodar, o problema é só deste repo.
+2. **10k partículas abaixo de 50 FPS no 2D** (44–82 ms/passo). Critério rebaixado para 5k; 10k depende da fase GPU.
+
+### Nunca verificado em navegador visível
+A verificação foi feita no painel do navegador do app, que ficava oculto e pausava o `requestAnimationFrame`.
+1. FPS real da página no 2D e no 3D (só a física isolada foi medida).
+2. Velocidade fixa de 60 passos/s rodando de verdade.
+
+(Copiar link: confirmado pelo usuário no celular.)
+
+### Funcionalidades (ordem sugerida)
+1. Física em WebGPU para 100k+ partículas (~1 dia; ver seção "Física").
+2. Mouse/toque atraindo ou repelindo partículas.
+3. Neblina de profundidade e auto-rotação no 3D.
+4. Contador de FPS e screenshot.
+5. VR/WebXR.
+
+### Polimento pequeno (das revisões de código; nada quebrado)
+1. Slider de partículas vai até 20k, mas acima de ~5k a simulação fica lenta.
+2. Versões das actions (`checkout@v4`, `setup-node@v4`, `upload-pages-artifact@v3`, `deploy-pages@v4`) não conferidas contra as mais recentes.
+3. Buffers da física (`cellOf`, `start`, `sorted`, `sp`, `sc`) recriados a cada passo; dá para reaproveitar por `count`/`nCells`.
+4. Cores das partículas reenviadas à GPU a cada frame; só precisam mudar no reset (usar flag "dirty", não só o tamanho do buffer).
+5. Tooltip da matriz usa "+0.2" em vez de "+0,2"; editor sem teclado; canvas da matriz sem ajuste de devicePixelRatio.
+
+### Limpeza
+- Branches `feat/2d-v1`, `feat/3d-v1` e `feat/extras` no GitHub já estão na `main` e podem ser apagadas.
+- Commit vazio `c834b94` (teste de diagnóstico do deploy) ficou no histórico; inofensivo.
+
 ## Riscos
 
 - `base` errado no Vite → página em branco no Pages (assets 404).
@@ -131,3 +164,4 @@ no navegador, 10k gastam 44–82 ms/passo (varia com a matriz). 10k fica para a 
 | 2026-10-31 | Layout no celular; investigação do gatilho de push; script `npm run deploy` |
 | 2026-10-31 | Plano e implementação do 3D v1 |
 | 2026-11-02 | Velocidade fixa, "toque diminui", presets, link compartilhável, rastro e brilho; presets em select |
+| 2026-11-02 | Documentação final e lista "Em aberto"; projeto em stand-by |

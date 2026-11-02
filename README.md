@@ -3,6 +3,8 @@
 Simulador de *particle life* no navegador, em 2D e 3D. Partículas de até 8 cores se atraem ou se
 repelem segundo uma matriz de regras, e disso surgem padrões que parecem vivos.
 
+> **Status:** em stand-by. O que ficou pendente está em [docs/brainstorm.md › Em aberto](docs/brainstorm.md#em-aberto-para-retomar).
+
 **Abrir:** https://augustobosa.github.io/particle-life-sim/ · **3D:** https://augustobosa.github.io/particle-life-sim/?3d
 
 ## Como usar
